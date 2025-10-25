@@ -12,6 +12,8 @@ public enum ErrorCode {
     INVALID_JWT_TOKEN("INVALID_JWT_TOKEN", "Invalid or malformed JWT token", HttpStatus.UNAUTHORIZED),
     INVALID_JWT_TOKEN_TYPE("INVALID_JWT_TOKEN_TYPE", "Invalid jwt token type", HttpStatus.UNAUTHORIZED),
     EXPIRED_JWT_TOKEN("EXPIRED_JWT_TOKEN", "Expired jwt token", HttpStatus.UNAUTHORIZED),
+    EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS", "Email already exists", HttpStatus.BAD_REQUEST),
+    INVALID_CREDENTIALS("INVALID_CREDENTIALS", "Invalid credentials", HttpStatus.UNAUTHORIZED),
     ;
     private final String code;
     private final String defaultMessage;
