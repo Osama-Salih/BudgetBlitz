@@ -9,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableJpaAuditing
 public class beansConfig {
 
     @Bean
@@ -20,5 +19,10 @@ public class beansConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public ApplicationAuditorAware auditorAware() {
+        return new ApplicationAuditorAware();
     }
 }
