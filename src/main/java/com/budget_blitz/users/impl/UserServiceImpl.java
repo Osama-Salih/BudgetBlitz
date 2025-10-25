@@ -1,5 +1,7 @@
 package com.budget_blitz.users.impl;
 
+import com.budget_blitz.exception.BusinessException;
+import com.budget_blitz.exception.ErrorCode;
 import com.budget_blitz.users.User;
 import com.budget_blitz.users.UserMapper;
 import com.budget_blitz.users.UserRepository;
@@ -7,7 +9,6 @@ import com.budget_blitz.users.UserService;
 import com.budget_blitz.users.request.ChangePasswordRequest;
 import com.budget_blitz.users.request.UpdateProfileInfoRequest;
 import com.budget_blitz.users.response.ProfileInfoResponse;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,14 +32,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public ProfileInfoResponse getProfileInfo(final Integer userId) {
         final User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         return this.userMapper.toProfileInfoResponse(user);
     }
 
     @Override
     public ProfileInfoResponse updateProfileInfo(final UpdateProfileInfoRequest request, final Integer userId) {
         final User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
         this.userMapper.updateProfileInfo(request, user);
         this.userRepository.save(user);
@@ -48,11 +49,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(final ChangePasswordRequest request, final Integer userId) {
         final User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
         final boolean isCurrentPasswordMatches = this.passwordEncoder.matches(request.getCurrentPassword(), user.getPassword());
         if (!isCurrentPasswordMatches) {
-            throw new RuntimeException("Invalid current password");
+            throw new BusinessException(ErrorCode.INVALID_CURRENT_PASSWORD);
         }
 
         final String encodedPassword = this.passwordEncoder.encode(request.getNewPassword());
@@ -63,10 +64,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivateAccount(final Integer userId) {
         final User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
         if (!user.isEnabled()) {
-            throw new RuntimeException("Your account is already deactivate");
+            throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_DEACTIVATE);
         }
 
         user.setEnabled(false);
@@ -76,10 +77,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void reactivateAccount(final Integer userId) {
         final User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
         if (user.isEnabled()) {
-            throw new RuntimeException("Your account is already active");
+            throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_ACTIVATE);
         }
 
         user.setEnabled(true);
