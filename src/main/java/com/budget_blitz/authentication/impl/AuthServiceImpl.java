@@ -7,10 +7,15 @@ import com.budget_blitz.authentication.request.RegisterRequest;
 import com.budget_blitz.authentication.response.AuthResponse;
 import com.budget_blitz.exception.BusinessException;
 import com.budget_blitz.exception.ErrorCode;
+import com.budget_blitz.role.Role;
+import com.budget_blitz.role.RoleRepository;
 import com.budget_blitz.secuirty.JwtService;
 import com.budget_blitz.users.User;
+import com.budget_blitz.users.UserMapper;
 import com.budget_blitz.users.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,20 +23,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
     @Override
     @Transactional
     public void register(final RegisterRequest request) {
-        checkEmail(request.getEmail());
-        // complete after adding the role
+       checkEmail(request.getEmail());
+
+       final Role role = this.roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new EntityNotFoundException("Role user not found"));
+
+       final User user = this.userMapper.toUser(request);
+       user.setRoles(Set.of(role));
+       this.userRepository.save(user);
+
+       log.info("User registered successfully with email: {}", user.getEmail());
+//       sendValidationEmail(user);
     }
 
     @Override
