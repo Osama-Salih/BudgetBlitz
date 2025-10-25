@@ -1,5 +1,7 @@
 package com.budget_blitz.secuirty;
 
+import com.budget_blitz.exception.BusinessException;
+import com.budget_blitz.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -77,18 +79,17 @@ public class JwtService {
                     .getPayload();
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Failed to parse JWT: {}", e.getMessage());
-            // Todo throw a butter exception
-            throw new RuntimeException("Invalid or malformed JWT token", e);
+            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
         }
     }
 
     public String refreshAccessToken(final String refreshToken) {
         final Claims claims = extractClaims(refreshToken);
         if (!"REFRESH_TOKEN".equals(claims.get(tokenType))) {
-            throw new RuntimeException("Invalid jwt token type");
+            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN_TYPE);
         }
         if (isTokenExpired(refreshToken)) {
-            throw new RuntimeException("expired jwt token");
+            throw new BusinessException(ErrorCode.EXPIRED_JWT_TOKEN);
         }
 
         final String username = claims.getSubject();

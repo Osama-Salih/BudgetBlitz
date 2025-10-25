@@ -9,7 +9,9 @@ public enum ErrorCode {
     INVALID_CURRENT_PASSWORD("INVALID_CURRENT_PASSWORD", "Invalid current password", HttpStatus.BAD_REQUEST),
     ACCOUNT_ALREADY_DEACTIVATE("ACCOUNT_ALREADY_DEACTIVATE","Your account is already deactivate", HttpStatus.BAD_REQUEST),
     ACCOUNT_ALREADY_ACTIVATE("ACCOUNT_ALREADY_ACTIVATE","Your account is already active", HttpStatus.BAD_REQUEST),
-
+    INVALID_JWT_TOKEN("INVALID_JWT_TOKEN", "Invalid or malformed JWT token", HttpStatus.UNAUTHORIZED),
+    INVALID_JWT_TOKEN_TYPE("INVALID_JWT_TOKEN_TYPE", "Invalid jwt token type", HttpStatus.UNAUTHORIZED),
+    EXPIRED_JWT_TOKEN("EXPIRED_JWT_TOKEN", "Expired jwt token", HttpStatus.UNAUTHORIZED),
     ;
     private final String code;
     private final String defaultMessage;
