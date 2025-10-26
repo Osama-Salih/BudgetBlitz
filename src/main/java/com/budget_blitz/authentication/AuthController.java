@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class AuthController {
     public ResponseEntity<Void> register(
             @RequestBody
             @Valid
-            final RegisterRequest request) {
+            final RegisterRequest request) throws MessagingException {
         this.authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
