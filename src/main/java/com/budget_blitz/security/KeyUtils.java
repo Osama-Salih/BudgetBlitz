@@ -1,4 +1,4 @@
-package com.budget_blitz.secuirty;
+package com.budget_blitz.security;
 
 import java.io.InputStream;
 import java.security.KeyFactory;

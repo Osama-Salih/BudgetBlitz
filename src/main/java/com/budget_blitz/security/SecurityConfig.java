@@ -1,8 +1,9 @@
-package com.budget_blitz.secuirty;
+package com.budget_blitz.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,10 +21,11 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
     private final static String[] PUBLIC_URLS = {
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
-            "/api/v1/auth/refresh",
-            "/api/v1/users/reactivate-me",
+            "/auth/login",
+            "/auth/register",
+            "/auth/refresh",
+            "/auth/activate-account",
+            "/users/reactivate-me",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -37,10 +39,11 @@ public class SecurityConfig {
             "/swagger-ui/index.html"
     };
 
+    @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
          return http
                 .cors(AbstractHttpConfigurer::disable)
-                .csrf(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                 auth.requestMatchers(PUBLIC_URLS)
                         .permitAll()

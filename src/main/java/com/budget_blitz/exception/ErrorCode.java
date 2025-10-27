@@ -14,6 +14,8 @@ public enum ErrorCode {
     EXPIRED_JWT_TOKEN("EXPIRED_JWT_TOKEN", "Expired jwt token", HttpStatus.UNAUTHORIZED),
     EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS", "Email already exists", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS("INVALID_CREDENTIALS", "Invalid credentials", HttpStatus.UNAUTHORIZED),
+    EXPIRED_ACTIVATION_CODE("EXPIRED_ACTIVATION_CODE", "Activation code has expired new code has been sent to your email address", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_VERIFIED("EMAIL_ALREADY_VERIFIED", "Your email already has been verified", HttpStatus.BAD_REQUEST),
     ;
     private final String code;
     private final String defaultMessage;

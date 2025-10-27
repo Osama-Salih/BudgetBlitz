@@ -1,4 +1,4 @@
-package com.budget_blitz.secuirty;
+package com.budget_blitz.security;
 
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
            @Nonnull HttpServletResponse response,
            @Nonnull FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getServletPath().contains("auth/**")) {
+        if (request.getServletPath().contains("/auth")) {
             filterChain.doFilter(request, response);
             return;
         }

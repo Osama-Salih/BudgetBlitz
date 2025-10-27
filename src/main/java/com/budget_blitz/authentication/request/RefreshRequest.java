@@ -17,7 +17,6 @@ import lombok.*;
 public class RefreshRequest {
 
     @NotBlank(message = "Refresh token required")
-    @Min(value = 20, message = "Refresh token appears invalid")
     @Schema(
             description = "The refresh token used to obtain a new access token",
             example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."

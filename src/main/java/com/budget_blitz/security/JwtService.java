@@ -1,4 +1,4 @@
-package com.budget_blitz.secuirty;
+package com.budget_blitz.security;
 
 import com.budget_blitz.exception.BusinessException;
 import com.budget_blitz.exception.ErrorCode;

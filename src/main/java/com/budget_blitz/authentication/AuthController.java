@@ -1,5 +1,6 @@
 package com.budget_blitz.authentication;
 
+import com.budget_blitz.authentication.request.ActivateAccountRequest;
 import com.budget_blitz.authentication.request.LoginRequest;
 import com.budget_blitz.authentication.request.RefreshRequest;
 import com.budget_blitz.authentication.request.RegisterRequest;
@@ -133,5 +134,30 @@ public class AuthController {
             @Valid
             final RefreshRequest request) {
         return ResponseEntity.ok(this.authService.refresh(request));
+    }
+
+    @Operation(
+            summary = "Activate user account",
+            description = "Activates a user's account using the 6-digit activation code sent to their email."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Account successfully activated"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired activation code",
+                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json"))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Activation code request body containing a valid 6-digit code",
+            required = true,
+            content = @Content(schema = @Schema(implementation = ActivateAccountRequest.class))
+    )
+    @PostMapping("/activate-account")
+    public ResponseEntity<Void> activateAccount(
+            @RequestBody
+            @Valid
+            final ActivateAccountRequest request) throws MessagingException {
+        this.authService.activateAccount(request);
+        return ResponseEntity.ok().build();
     }
 }

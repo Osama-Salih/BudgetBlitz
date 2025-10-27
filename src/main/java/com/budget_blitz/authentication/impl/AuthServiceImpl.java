@@ -1,6 +1,7 @@
 package com.budget_blitz.authentication.impl;
 
 import com.budget_blitz.authentication.AuthService;
+import com.budget_blitz.authentication.request.ActivateAccountRequest;
 import com.budget_blitz.authentication.request.LoginRequest;
 import com.budget_blitz.authentication.request.RefreshRequest;
 import com.budget_blitz.authentication.request.RegisterRequest;
@@ -11,11 +12,8 @@ import com.budget_blitz.exception.BusinessException;
 import com.budget_blitz.exception.ErrorCode;
 import com.budget_blitz.role.Role;
 import com.budget_blitz.role.RoleRepository;
-import com.budget_blitz.secuirty.JwtService;
-import com.budget_blitz.users.Token;
-import com.budget_blitz.users.User;
-import com.budget_blitz.users.UserMapper;
-import com.budget_blitz.users.UserRepository;
+import com.budget_blitz.security.JwtService;
+import com.budget_blitz.users.*;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +38,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailService emailService;
-    private final EmailTemplateName emailTemplateName;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -54,13 +52,7 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        final User user = this.userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        final boolean passwordMatch = this.passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!passwordMatch) {
-            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
-        }
+        final User user = (User) auth.getPrincipal();
         final String accessToken = this.jwtService.generateAccessToken(user.getEmail());
         final String refreshToken = this.jwtService.generateRefreshToken(user.getEmail());
         final String tokenType = "Bearer ";
@@ -100,6 +92,32 @@ public class AuthServiceImpl implements AuthService {
        sendValidationEmail(user);
     }
 
+    @Override
+    public void activateAccount(final ActivateAccountRequest request) throws MessagingException {
+        final Token savedToken = this.tokenRepository.findAll()
+                .stream()
+                .filter(token -> this.passwordEncoder.matches(request.getCode(), token.getToken()))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Invalid token"));
+
+        if (savedToken.getValidatedAt() != null) {
+            throw new BusinessException(ErrorCode.EMAIL_ALREADY_VERIFIED);
+        }
+
+        final User user = this.userRepository.findById(savedToken.getUser().getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, savedToken.getUser().getId()));
+        if (savedToken.getExpiredAt().isBefore(LocalDateTime.now())) {
+            sendValidationEmail(user);
+            throw new BusinessException(ErrorCode.EXPIRED_ACTIVATION_CODE);
+        }
+        savedToken.setValidatedAt(LocalDateTime.now());
+        this.tokenRepository.save(savedToken);
+
+        user.setEmailVerified(true);
+        user.setEnabled(true);
+        this.userRepository.save(user);
+    }
+
     private void sendValidationEmail(final User user) throws MessagingException {
         final String newToken = generateAndSaveActivationToken(user);
         this.emailService.sendEmail(
@@ -111,13 +129,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String generateAndSaveActivationToken(final User user) {
-        final String generatedCode = generateActivationCode(6);
-         Token.builder()
-                .token(generatedCode)
+         final String generatedCode = generateActivationCode(6);
+         final Token token = Token.builder()
+                .token(this.passwordEncoder.encode(generatedCode))
                 .createdAt(LocalDateTime.now())
                 .expiredAt(LocalDateTime.now().plusMinutes(15))
                 .user(user)
                 .build();
+        this.tokenRepository.save(token);
         return generatedCode;
     }
 
@@ -127,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
         final SecureRandom secureRandom = new SecureRandom();
 
         for (int i = 0; i < length; i++) {
-            int nextIndex = secureRandom.nextInt();
+            int nextIndex = secureRandom.nextInt(sourceCode.length());
             stringBuilder.append(sourceCode.charAt(nextIndex));
         }
         return stringBuilder.toString();

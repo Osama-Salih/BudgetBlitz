@@ -52,7 +52,7 @@ public class RegisterRequest {
     @Schema(description = "User's email address", example = "osama@budget.blitz.com")
     private String email;
 
-    @NotBlank(message = "Date of birth required")
+    @NotNull(message = "Date of birth required")
     @Past(message = "Date of birth must be in the past")
     @Schema(description = "User's date of birth in YYYY-MM-DD format", example = "2000-06-06")
     private LocalDate dateOfBirth;

@@ -1,24 +1,36 @@
 package com.budget_blitz.validation.password;
 
-import com.budget_blitz.users.request.ChangePasswordRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordMatchValidator implements ConstraintValidator<PasswordMatches, ChangePasswordRequest> {
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+public class PasswordMatchValidator implements ConstraintValidator<PasswordMatches, Object> {
     @Override
-    public boolean isValid(ChangePasswordRequest request, ConstraintValidatorContext context) {
-        if (request.getNewPassword() == null || request.getConfirmPassword() == null) {
-            return true;
-        }
+    public boolean isValid(final Object obj, final ConstraintValidatorContext context) {
 
-        final boolean matches = request.getNewPassword().equals(request.getConfirmPassword());
-        if (!matches) {
-            context.disableDefaultConstraintViolation();
+            try {
+                final Method getPassword = obj.getClass().getMethod("getPassword");
+                final Method getConfirmPassword = obj.getClass().getMethod("getConfirmPassword");
 
-            context.buildConstraintViolationWithTemplate("Confirm password and new password mismatch")
-                    .addPropertyNode("confirmPassword")
-                    .addConstraintViolation();
-        }
-        return matches;
+                final String password = (String) getPassword.invoke(obj);
+                final String confirmPassword = (String) getConfirmPassword.invoke(obj);
+
+                if (password == null || confirmPassword == null) {
+                    return true;
+                }
+
+                final boolean matches = password.equals(confirmPassword);
+                if (!matches) {
+                    context.disableDefaultConstraintViolation();
+                    context.buildConstraintViolationWithTemplate("Confirm password and new password mismatch")
+                            .addPropertyNode("confirmPassword")
+                            .addConstraintViolation();
+                }
+                return matches;
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                return false;
+            }
     }
 }

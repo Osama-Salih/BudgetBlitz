@@ -3,7 +3,6 @@ package com.budget_blitz.users;
 import com.budget_blitz.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -73,7 +72,7 @@ public class User implements UserDetails {
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -113,7 +112,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return !enabled;
+        return enabled;
     }
 
     public String fullName() {
