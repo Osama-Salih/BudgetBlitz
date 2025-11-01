@@ -2,6 +2,7 @@ package com.budget_blitz.handler;
 
 import com.budget_blitz.exception.BusinessException;
 import com.budget_blitz.exception.ErrorCode;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.mail.MessagingException;
@@ -13,13 +14,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestControllerAdvice
@@ -159,11 +160,21 @@ public class GlobalApplicationHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleException(final HttpMessageNotReadableException ex) {
-          final ErrorResponse body = ErrorResponse.builder()
-                  .code("HttpMessageNotReadableException")
-                  .defaultMessage(ex.getMessage())
+
+        final Throwable cause = ex.getCause();
+        final String errorMessage;
+        if (cause instanceof InvalidFormatException invalidFormatException &&
+            invalidFormatException.getTargetType() == LocalDate.class) {
+            errorMessage = "Invalid date format. Expected format: yyyy-MM-dd";
+        } else {
+            errorMessage = ErrorCode.HTTP_MESSAGE_NOT_READABLE.getDefaultMessage();
+        }
+
+        final ErrorResponse body = ErrorResponse.builder()
+                  .code(ErrorCode.HTTP_MESSAGE_NOT_READABLE.getCode())
+                  .defaultMessage(errorMessage)
                   .build();
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+          return ResponseEntity.status(ErrorCode.HTTP_MESSAGE_NOT_READABLE.getStatus()).body(body);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -238,6 +249,17 @@ public class GlobalApplicationHandler {
                 .build();
 
         return ResponseEntity.status(ErrorCode.EMAIL_SENDING_FAILED.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(MailSendException.class)
+    public ResponseEntity <ErrorResponse> handleException(final MailSendException ex) {
+        log.error("Mail server connection failed", ex);
+        final ErrorResponse body = ErrorResponse.builder()
+                .code("MAIL_SERVER_CONNECTION_FAILED")
+                .defaultMessage(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     @ExceptionHandler(Exception.class)

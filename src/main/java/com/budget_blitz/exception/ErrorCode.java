@@ -25,6 +25,7 @@ public enum ErrorCode {
     DATA_INTEGRITY_VIOLATION("DATA_INTEGRITY_VIOLATION", "Data integrity violation", HttpStatus.BAD_REQUEST),
     EMAIL_SENDING_FAILED("EMAIL_SENDING_FAILED", "Failed to send email. Please try again later", HttpStatus.INTERNAL_SERVER_ERROR),
     INTERNAL_SERVER_ERR("INTERNAL_SERVER_ERR", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
+    HTTP_MESSAGE_NOT_READABLE("HTTP_MESSAGE_NOT_READABLE", "Malformed JSON request", HttpStatus.BAD_REQUEST),
     ;
     private final String code;
     private final String defaultMessage;
