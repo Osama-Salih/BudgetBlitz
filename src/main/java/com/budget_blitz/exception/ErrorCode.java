@@ -27,6 +27,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERR("INTERNAL_SERVER_ERR", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     HTTP_MESSAGE_NOT_READABLE("HTTP_MESSAGE_NOT_READABLE", "Malformed JSON request", HttpStatus.BAD_REQUEST),
     CATEGORY_ALREADY_EXISTS("CATEGORY_ALREADY_EXISTS", "You already have a category with the same name", HttpStatus.BAD_REQUEST),
+    EXPENSE_ALREADY_EXISTS("EXPENSE_ALREADY_EXISTS", "You already hava an expense with the same amount and date for this category",HttpStatus.BAD_REQUEST),
     ;
     private final String code;
     private final String defaultMessage;

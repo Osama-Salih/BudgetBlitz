@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("""
@@ -22,4 +24,12 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             WHERE c.user.id =:userId
             """)
     Page<Category> findAllCategoriesByUserId(Pageable pageable, @Param("userId") Integer userId);
+
+    @Query("""
+            SELECT c
+            FROM Category c
+            WHERE c.id =:categoryId
+            AND c.user.id =:userId
+            """)
+    Optional<Category> findByCategoryIdAndUserId(@Param("categoryId") Integer categoryId, @Param("userId") Integer id);
 }
