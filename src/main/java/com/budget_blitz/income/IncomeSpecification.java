@@ -2,6 +2,7 @@ package com.budget_blitz.income;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class IncomeSpecification {
@@ -19,7 +20,7 @@ public class IncomeSpecification {
         };
     }
 
-    public static Specification<Income> amountGreaterThen(Double amount) {
+    public static Specification<Income> amountGreaterThen(BigDecimal amount) {
         return (root, query, cb) -> {
             if (amount == null) {
                 return cb.conjunction();
@@ -28,7 +29,7 @@ public class IncomeSpecification {
         };
     }
 
-    public static Specification<Income> amountLessThen(Double amount) {
+    public static Specification<Income> amountLessThen(BigDecimal amount) {
         return (root, query, cb) -> {
             if (amount == null) {
                 return cb.conjunction();

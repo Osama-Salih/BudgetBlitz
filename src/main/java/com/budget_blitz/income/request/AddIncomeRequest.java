@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -21,7 +23,7 @@ public class AddIncomeRequest {
             example = "1500.00",
             requiredMode = Schema.RequiredMode.REQUIRED
     )
-    private Double amount;
+    private BigDecimal amount;
 
     @NotNull(message = "Date required")
     @PastOrPresent(message = "Date cannot be in the future")

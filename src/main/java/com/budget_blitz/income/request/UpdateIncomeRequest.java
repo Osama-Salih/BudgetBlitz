@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -22,7 +23,7 @@ public class UpdateIncomeRequest {
             description = "Updated income amount. Must be 0.0 or higher.",
             example = "2500.50"
     )
-    private Double amount;
+    private BigDecimal amount;
 
     @PastOrPresent(message = "Date cannot be in the future")
     @JsonFormat(pattern = "yyyy-MM-dd")

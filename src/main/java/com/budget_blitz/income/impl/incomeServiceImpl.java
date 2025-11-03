@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,20 +62,34 @@ public class incomeServiceImpl implements IncomeService {
     }
 
     @Override
+    @Transactional
     public IncomeResponse addIncome(final AddIncomeRequest request, final Integer userId) {
+
         final User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
-        user.getRoles()
+        boolean isUserRole = user.getRoles()
                 .stream()
-                .filter(r -> r.getName().equals("ROLE_USER"))
-                .findAny()
-                .orElseThrow(() -> new BusinessException(ErrorCode.ACCESS_DENIED));
+                .anyMatch(role -> role.getName().equals("ROLE_USER"));
 
-        final Income createdIncome = this.incomeMapper.toIncome(request, user);
-        this.incomeRepository.save(createdIncome);
-        log.info("Saving income: {}", createdIncome);
-        return this.incomeMapper.toIncomeResponse(createdIncome);
+        if (!isUserRole) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
+        boolean exists = incomeRepository.existsByUserIdAndAmountAndDate(
+                user.getId(),
+                request.getAmount(),
+                request.getDate());
+
+        if (exists) {
+            throw new BusinessException(ErrorCode.INCOME_ALREADY_EXISTS);
+        }
+
+        final Income income = this.incomeMapper.toIncome(request, user);
+        this.incomeRepository.save(income);
+        log.info("Saving income: {}", income);
+
+        return this.incomeMapper.toIncomeResponse(income);
     }
 
     @Override
@@ -100,6 +115,7 @@ public class incomeServiceImpl implements IncomeService {
         this.incomeMapper.updateIncomeRequestToIncome(request, income);
         log.debug("Updated income: {}", income);
         this.incomeRepository.save(income);
+
         return this.incomeMapper.toIncomeResponse(income);
     }
 

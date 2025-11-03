@@ -3,6 +3,7 @@ package com.budget_blitz.income.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -23,7 +24,7 @@ public class IncomeResponse {
             description = "Income amount",
             example = "2500.75"
     )
-    private double amount;
+    private BigDecimal amount;
 
     @Schema(
             description = "Date when the income was received",

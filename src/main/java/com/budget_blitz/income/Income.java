@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -17,16 +18,21 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "incomes")
+@Table(name = "incomes",
+        indexes = {
+                @Index(name = "idx_income_user", columnList = "user_id"),
+                @Index(name = "idx_income_date", columnList = "date")
+        }
+)
 public class Income extends BaseEntity {
 
-    @Column(name = "amount", nullable = false)
-    private double amount;
+    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description", nullable = true, length = 250)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
