@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
        final Role role = this.roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new EntityNotFoundException("Role user not found"));
 
-       final User user = this.userMapper.toUser(request);
+       final User user = this.userMapper.toUser(request, passwordEncoder);
        user.setRoles(Set.of(role));
        this.userRepository.save(user);
 

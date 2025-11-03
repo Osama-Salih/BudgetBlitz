@@ -1,6 +1,7 @@
 package com.budget_blitz.users.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -14,18 +15,29 @@ import lombok.*;
         description = "Request payload for updating user's profile information"
 )
 public class UpdateProfileInfoRequest {
+
+    @Size(
+            min = 2,
+            max = 50,
+            message = "First name must be between 2 to 50 character length"
+    )
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "First name must contain only letters")
     @Schema(
-            description = "User's first name (optional). Must be between 1 and 10 characters if provided.",
+            description = "User's first name (optional). must be between 2 and 50 characters.",
             example = "Osama"
     )
-    @Size(min = 1, max = 10, message = "First name length must be between 1 to 10 characters")
     private String firstName;
 
+    @Size(
+            min = 2,
+            max = 50,
+            message = "Last name must be between 2 to 50 character length"
+    )
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Last name must contain only letters")
     @Schema(
-            description = "User's last name (optional). Must be between 1 and 10 characters if provided.",
+            description = "User's last name (optional). must be between 2 and 50 characters.",
             example = "Salih"
     )
-    @Size(min = 1, max = 10, message = "Last name length must be between 1 to 10 characters")
     private String lastName;
 }
 

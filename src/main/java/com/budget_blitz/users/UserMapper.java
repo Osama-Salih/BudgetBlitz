@@ -3,48 +3,28 @@ package com.budget_blitz.users;
 import com.budget_blitz.authentication.request.RegisterRequest;
 import com.budget_blitz.users.request.UpdateProfileInfoRequest;
 import com.budget_blitz.users.response.ProfileInfoResponse;
-import lombok.RequiredArgsConstructor;
+import org.mapstruct.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    private final PasswordEncoder passwordEncoder;
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "lastName", source = "lastName")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "dateOfBirth", source = "dateOfBirth")
+    public ProfileInfoResponse toProfileInfoResponse(final User user);
 
-    public ProfileInfoResponse toProfileInfoResponse(final User user) {
-        return ProfileInfoResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .dateOfBirth(user.getDateOfBirth())
-                .build();
-    }
 
-    public void updateProfileInfo(final UpdateProfileInfoRequest request, final User user) {
-       if (request.getFirstName() != null && !user.getFirstName().equals(request.getFirstName())) {
-           user.setFirstName(request.getFirstName());
-       }
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public void updateProfileInfo(final UpdateProfileInfoRequest request, @MappingTarget final User user);
 
-        if (request.getLastName() != null && !user.getLastName().equals(request.getLastName())) {
-            user.setLastName(request.getLastName());
-        }
-    }
-
-    public User toUser(final RegisterRequest request) {
-        return User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .dateOfBirth(request.getDateOfBirth())
-                .password(this.passwordEncoder.encode(request.getPassword()))
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .enabled(false)
-                .emailVerified(false)
-                .expired(false)
-                .build();
-    }
+    @Mapping(target = "password", expression = "java(passwordEncoder.encode(request.getPassword()))")
+    @Mapping(target = "accountLocked", constant = "false")
+    @Mapping(target = "credentialsExpired", constant = "false")
+    @Mapping(target = "enabled", constant = "false")
+    @Mapping(target = "emailVerified", constant = "false")
+    @Mapping(target = "expired", constant = "false")
+    public User toUser(final RegisterRequest request, @Context PasswordEncoder passwordEncoder);
 }
