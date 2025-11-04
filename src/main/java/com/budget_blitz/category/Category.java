@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "categories")
 public class Category extends BaseEntity {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
