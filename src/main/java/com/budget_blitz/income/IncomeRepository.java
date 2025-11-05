@@ -18,4 +18,14 @@ public interface IncomeRepository extends JpaRepository<Income, Integer>, JpaSpe
            
             """)
     boolean existsByUserIdAndAmountAndDate(@Param("userId") Integer userId, @Param("amount") BigDecimal amount, @Param("date") LocalDate date);
+
+
+    @Query("""
+            SELECT SUM(i.amount)
+            FROM Income i
+            WHERE i.user.id =:userId
+            AND (:month IS NULL OR MONTH(i.date) = :month)
+            AND (:year IS NULL OR YEAR(i.date) = :year)
+            """)
+    BigDecimal getTotalIncome(@Param("userId") Integer userId, @Param("month") Integer month, @Param("year") Integer year);
 }
