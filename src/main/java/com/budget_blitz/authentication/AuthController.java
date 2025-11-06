@@ -1,9 +1,6 @@
 package com.budget_blitz.authentication;
 
-import com.budget_blitz.authentication.request.ActivateAccountRequest;
-import com.budget_blitz.authentication.request.LoginRequest;
-import com.budget_blitz.authentication.request.RefreshRequest;
-import com.budget_blitz.authentication.request.RegisterRequest;
+import com.budget_blitz.authentication.request.*;
 import com.budget_blitz.authentication.response.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final ForgotPasswordService forgotPasswordService;
 
     @Operation(
             summary = "Register a new user",
@@ -159,5 +157,72 @@ public class AuthController {
             final ActivateAccountRequest request) throws MessagingException {
         this.authService.activateAccount(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Request password reset",
+            description = "Sends a 6-digit verification code to the user's registered email address to start the password reset process.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "User's email address for password reset request",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ForgotPasswordRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Reset code sent successfully"),
+                    @ApiResponse(responseCode = "404", description = "User not found with the provided email", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Error while sending the email", content = @Content)
+            }
+    )
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @RequestBody
+            @Valid
+            final ForgotPasswordRequest request) throws MessagingException {
+        this.forgotPasswordService.forgotPassword(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @Operation(
+            summary = "Verify password reset code",
+            description = "Verifies the 6-digit code sent to the user's email before allowing password reset.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "6-digit code sent to the user's email",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ResetCodeRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Reset code verified successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid or expired reset code", content = @Content)
+            }
+    )
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<Void> verifyResetCode(
+            @RequestBody
+            @Valid
+            final ResetCodeRequest request) throws MessagingException {
+        this.forgotPasswordService.verifyResetCode(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @Operation(
+            summary = "Reset password",
+            description = "Resets the user's password after successful verification of the reset code.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "New password and confirmation password for the user",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ResetPasswordRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password reset successfully",
+                            content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Passwords do not match or invalid reset request", content = @Content)
+            }
+    )
+    @PatchMapping("/reset-password")
+    public ResponseEntity<AuthResponse> resetPassword(
+            @RequestBody
+            @Valid
+            final ResetPasswordRequest request) {
+        return ResponseEntity.ok(this.forgotPasswordService.resetPassword(request));
     }
 }

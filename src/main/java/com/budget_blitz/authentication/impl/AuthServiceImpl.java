@@ -1,10 +1,7 @@
 package com.budget_blitz.authentication.impl;
 
 import com.budget_blitz.authentication.AuthService;
-import com.budget_blitz.authentication.request.ActivateAccountRequest;
-import com.budget_blitz.authentication.request.LoginRequest;
-import com.budget_blitz.authentication.request.RefreshRequest;
-import com.budget_blitz.authentication.request.RegisterRequest;
+import com.budget_blitz.authentication.request.*;
 import com.budget_blitz.authentication.response.AuthResponse;
 import com.budget_blitz.email.EmailService;
 import com.budget_blitz.email.EmailTemplateName;
@@ -119,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void sendValidationEmail(final User user) throws MessagingException {
-        final String newToken = generateAndSaveActivationToken(user);
+        final String newToken = generateAndSaveToken(user);
         this.emailService.sendEmail(
                 user.getEmail(),
                 user.fullName(),
@@ -128,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
                 "Activate Your BudgetBlitz Account – Use Your Verification Code");
     }
 
-    private String generateAndSaveActivationToken(final User user) {
+    public String generateAndSaveToken(final User user) {
          final String generatedCode = generateActivationCode(6);
          final Token token = Token.builder()
                 .token(this.passwordEncoder.encode(generatedCode))

@@ -29,6 +29,10 @@ public enum ErrorCode {
     CATEGORY_ALREADY_EXISTS("CATEGORY_ALREADY_EXISTS", "You already have a category with the same name", HttpStatus.BAD_REQUEST),
     EXPENSE_ALREADY_EXISTS("EXPENSE_ALREADY_EXISTS", "You already hava an expense with the same amount and date for this category",HttpStatus.BAD_REQUEST),
     INCOME_ALREADY_EXISTS("INCOME_ALREADY_EXISTS", "You already hava an income with the same amount and date", HttpStatus.BAD_REQUEST),
+    USER_EMAIL_NOT_FOUND("USER_EMAIL_NOT_FOUND", "No user with this email, Please double-check your email and try again.", HttpStatus.NOT_FOUND),
+    RESET_CODE_ALREADY_VERIFIED("RESET_CODE_ALREADY_VERIFIED", "Reset code already has been verified", HttpStatus.BAD_REQUEST),
+    EXPIRED_RESET_CODE("EXPIRED_RESET_CODE", "Reset code has expired new code has been sent to your email address", HttpStatus.BAD_REQUEST),
+
     ;
     private final String code;
     private final String defaultMessage;
