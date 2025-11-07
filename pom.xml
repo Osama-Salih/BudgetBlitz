@@ -11,8 +11,8 @@
 	<groupId>com.budget-blitz</groupId>
 	<artifactId>budet-blitz-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>budet-blitz-api</name>
-	<description>Budet-blitz</description>
+	<name>budget-blitz-api</name>
+	<description>Budget-blitz</description>
 	<url/>
 	<licenses>
 		<license/>
