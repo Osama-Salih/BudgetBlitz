@@ -32,7 +32,8 @@ public enum ErrorCode {
     USER_EMAIL_NOT_FOUND("USER_EMAIL_NOT_FOUND", "No user with this email, Please double-check your email and try again.", HttpStatus.NOT_FOUND),
     RESET_CODE_ALREADY_VERIFIED("RESET_CODE_ALREADY_VERIFIED", "Reset code already has been verified", HttpStatus.BAD_REQUEST),
     EXPIRED_RESET_CODE("EXPIRED_RESET_CODE", "Reset code has expired new code has been sent to your email address", HttpStatus.BAD_REQUEST),
-
+    INVALID_PUBLIC_KEY("INVALID_PUBLIC_KEY", "Public key content is missing or empty", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_PRIVATE_KEY("INVALID_PRIVATE_KEY", "Private key content is missing or empty", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     private final String code;
     private final String defaultMessage;
