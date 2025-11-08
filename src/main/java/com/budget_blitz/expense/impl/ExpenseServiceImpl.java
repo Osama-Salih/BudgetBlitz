@@ -43,7 +43,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .and(ExpenseSpecification.dateBetween(filter.getFromDate(), filter.getToDate()))
                 .and(ExpenseSpecification.amountGreaterThen(filter.getMinAmount()))
                 .and(ExpenseSpecification.amountLessThen(filter.getMaxAmount()))
-                .and(ExpenseSpecification.belongToCategory(filter.getCategoryName()))
+                .and(ExpenseSpecification.belongToCategory(filter.getCategory()))
                 .and(ExpenseSpecification.containKeyword(filter.getKeyword()));
 
 

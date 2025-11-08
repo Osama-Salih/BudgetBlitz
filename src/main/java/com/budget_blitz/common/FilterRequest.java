@@ -21,19 +21,19 @@ public class FilterRequest {
             example = "0",
             defaultValue = "0"
     )
-    private final int page = 0;
+    private int page = 0;
     @Schema(
             description = "Number of records per page",
             example = "10",
             defaultValue = "10"
     )
-    private final int size = 10;
+    private int size = 10;
     @Schema(
             description = "Sorting criteria in the format: field,order (e.g., createdDate,DESC)",
             example = "createdDate,ASC",
             defaultValue = "createdDate,DESC"
     )
-    private final String sort = "createdDate,DESC";
+    private String sort = "createdDate,DESC";
     @Schema(
             description = "Start date for filtering (inclusive)",
             example = "2024-01-01"

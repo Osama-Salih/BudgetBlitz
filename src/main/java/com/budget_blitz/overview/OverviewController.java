@@ -37,8 +37,8 @@ public class OverviewController {
     )
     @GetMapping
     public ResponseEntity<OverviewResponse> getOverview(
-            @Parameter(hidden = true) @ModelAttribute final OverviewFilterRequest filterRequest,
-            @Parameter(description = "Filter options, (month, year)") final Authentication principal) {
+            @Parameter(description = "Filter options, (month, year)") @ModelAttribute final OverviewFilterRequest filterRequest,
+            @Parameter(hidden = true) final Authentication principal) {
         return ResponseEntity.ok(this.overviewService.getOverview(filterRequest, getUserId(principal)));
     }
 
